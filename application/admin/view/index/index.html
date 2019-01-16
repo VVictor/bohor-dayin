@@ -1,0 +1,290 @@
+{extend name="public/base" /}
+
+{block name="title"}<title>{$Think.lang.list}</title>{/block}
+
+{block name="pjax_container"}
+<link rel="stylesheet" type="text/css" href="__STATIC__/layui/dist/css/layui.css">
+<script type="text/javascript" src="__STATIC__/layui/dist/layui.js"></script>
+<style type="text/css">
+.box-header h3{
+    width: 80px;
+    height: 26px;
+    background: #3c8dbc;
+    text-align: center;
+    line-height: 26px;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.layui-input, .layui-select, .layui-textarea{
+    height:30px;
+}
+.box-header>.box-tools form{
+    overflow:hidden;
+}
+.layui-form-label{
+    padding:0;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+.layui-inline{
+    float:left;
+    margin-right:6px;
+}
+.layui-inline select{
+    width: 100px;
+    height: 25px;
+    margin-top: 2px;
+}
+.input-group{
+    float:right;
+}
+.dayinBtn span{
+    display: block;
+    width: 55px;
+    height: 22px;
+    background: #3c8dbc;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+.operate{
+    overflow: hidden;
+}
+.dayinBtn{
+    float: left;
+}
+.dayinBtn span{
+    display: block;
+    width: 55px;
+    height: 22px;
+    background: #3c8dbc;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+.look{
+    float: left;
+    margin-left: 10px;
+}
+.look span{
+    display: block;
+    width: 55px;
+    height: 22px;
+    background: #3c8dbc;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+</style>
+<section class="content-header">
+    <h1>{$Think.lang.c_title}</h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">批量打印</h3>
+
+                    <div class="box-tools" style="top:10px;">
+                        <form action="/" method="GET" pjax-search="">
+                            <div class="layui-inline">
+                                <select name="list"> 
+                                   <option>显示条数</option>
+                                   <option value="20">20</option> 
+                                   <option value="50">50</option>
+                                   <option value="100">100</option> 
+                                </select> 
+                            </div>
+                            <div class="layui-inline">
+                              <label class="layui-form-label">请选择范围</label>
+                              <div class="layui-input-inline date">
+                               <!--  <p class="dateTxt" style="width: 100%;height: 30px;border:1px solid #e6e6e6;"></p> -->
+                                <input type="text" class="layui-input" name="f_time" value="{:input('get.f_time')}" id="test16" placeholder="开始 到 结束" autocomplete="off">
+                              </div>
+                            </div>
+                            <div class="input-group input-group-sm" style="width:150px;">
+                                <input type="text" name="f_ID" class="form-control pull-right" value="{:input('get.f_ID')}" placeholder="{$Think.lang.search}" />
+                                <div class="input-group-btn"><button type="submit" class="btn btn-default sreachs"><i class="fa fa-search"></i></button></div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <div class="box-body table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th width="35">
+                                <input type="checkbox" class="minimal checkbox-toggle">
+                            </th>
+                            <th>{$Think.lang.f_ID}</th>
+                            <th>{$Think.lang.f_NAME}</th>
+                            <th>{$Think.lang.f_single}</th>
+                            <th>支付金额</th>
+                            <th>价税金额</th>
+                            <th>{$Think.lang.f_membertype}</th>
+                            <th width="255">{$Think.lang.action}</th>
+                        </tr>
+                        {volist name="list" id="vo" key="k"}
+                        <tr>
+                            <td><input type="checkbox" name="member" value="{$vo.f_ID},{$vo.f_single}" class="minimal"></td>
+                            <td>{$vo.f_ID}</td>
+                            <td>{$vo.f_NAME}</td>
+                            <td>{$vo.f_single}</td>
+                            <td>{$vo.f_price}</td>
+                            <td>{$vo.heji}</td>
+                            <td>{$vo.f_membertype}</td>
+                            <td class="operate">
+                                <div class="dayinBtn" data-id='{$vo.f_ID}' data-single='{$vo.f_single}'>
+                                    <span>
+                                        <i class="fa fa-edit"></i>
+                                    打印
+                                    </span>
+                                </div>
+                                <div class="look">
+                                    {:auth_action(CONTROLLER_NAME.'/see', 'a', lang('查看'), ['id' => $vo.f_ID,'f_single'=>$vo.f_single])}
+                                </div>
+                            
+                            </td>
+                        </tr>
+                        {/volist}
+                    </table>
+                </div>
+                <div class="box-footer clearfix">
+                    {$list->render()|raw}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div id="print-content">
+
+</div> 
+<script type="text/javascript">
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+      laydate.render({
+        elem: '#test16'
+        ,type: 'datetime'
+        ,range: '~'
+      });
+});
+
+$(function(){
+    /*ajax页面加载icheck，有该控件的页面才需要*/
+    $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+        checkboxClass: 'icheckbox_minimal-blue',
+        radioClass: 'iradio_minimal-blue'
+    });
+
+    /*全选-反选*/
+    $('.checkbox-toggle').on('ifChecked', function(event){
+        var _this = $(this);
+        var _table = _this.closest('.table');
+        _table.find("tr td input[type='checkbox']").iCheck("check");
+    });
+    $('.checkbox-toggle').on('ifUnchecked', function(event){
+        var _this = $(this);
+        var _table = _this.closest('.table');
+        _table.find("tr td input[type='checkbox']").iCheck("uncheck");
+    });
+
+    $('.editable').editable({
+        emptytext: "empty",
+        params: function(params) {      //参数
+            var data = {};
+            data['id'] = params.pk;
+            data[params.name] = params.value;
+            return data;
+        },
+        success: function(response, newValue) {
+            var res = $.parseJSON( response );
+            if(res.status == 1){
+                toastr.success(res.info);
+            }else{
+                return res.info;
+            }
+        }
+    });
+    // var dateTxt = $('.date input').val();
+    // console.log(dateTxt)
+    // $('p.dateTxt').html(dateTxt)
+    $('.dayinBtn').click(function(){
+        var f_ID = $(this).attr('data-id');
+        var f_single = $(this).attr('data-single');
+        $.ajax({
+            url:"{:url('printing')}",
+            type:"POST",
+            data:{"id":f_ID,"f_single":f_single},
+            // dataType:"html",
+            success:function(data){
+               $('.content-header').css('display','none')
+               $('.content').css('display','none');
+               $('footer').css('display','none');
+               $("#print-content").css('display','block');
+               $("#print-content").append(data);
+                window.print();
+               $('.content-header').css('display','block')
+               $('.content').css('display','block');
+               $('footer').css('display','block')
+               $("#print-content").empty();
+               $("#print-content").css('display','none');
+            }
+        })    
+    })
+    $('.box-title').click(function(){
+    var cheMember =$('input[name="member"]');
+    var dataMember = new Array();
+    
+    for(var i=0;i<cheMember.length;i++){
+        var str = cheMember[i].value;
+        console.log(str)
+        if(cheMember[i].checked){
+            var strSplit = str.split(",");
+            var dataTemp = {};
+            dataTemp.f_ID=strSplit[0];
+            dataTemp.f_single=strSplit[1];
+            dataMember.push(dataTemp);
+
+          
+        }
+       
+      }
+        console.log(dataMember)
+        if(dataMember.length == 0){
+            alert("请先选择您要打印的数据");
+            return false;
+        }
+      // var dataPoint=JSON.stringify(dataMember);
+      // console.log(dataPoint)
+      $.ajax({
+        url:"{:url('printings')}",
+        type:"POST",
+        data:{"dataMember":dataMember},
+        success:function(data){
+               $('.content-header').css('display','none')
+               $('.content').css('display','none');
+               $('footer').css('display','none')
+               $("#print-content").append(data);
+               $("#print-content").css('display','block');
+                window.print();
+               $('.content-header').css('display','block')
+               $('.content').css('display','block');
+               $('footer').css('display','block');
+               $("#print-content").empty();
+               $("#print-content").css('display','none');
+        }
+      })
+    })
+
+})
+</script>
+{/block}

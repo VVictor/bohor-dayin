@@ -1,0 +1,185 @@
+{extend name="public/base" /}
+
+{block name="title"}<title>{$Think.lang.list}</title>{/block}
+
+{block name="pjax_container"}
+<link rel="stylesheet" type="text/css" href="__STATIC__/layui/dist/css/layui.css">
+<script type="text/javascript" src="__STATIC__/layui/dist/layui.js"></script>
+ <style type="text/css">
+    * {
+     -webkit-box-sizing: border-box; 
+     -moz-box-sizing: border-box;
+     box-sizing: border-box; 
+    }
+    p{
+      margin: 0;
+    }
+    .label-tit p{
+        border-right: 1px solid #000;
+        text-align: center;
+        min-height: 22px;
+        line-height: 22px;
+    }
+    .label-tit p:last-child{
+      border-right: 0;
+    }
+    .div1 div{
+      border-right: 1px solid #000;
+      min-height: 20px;
+      line-height: 20px;
+      text-align: right;
+      padding-right: 5px;
+    }
+    .div1 div:last-child{
+      border-right: 0;
+    }
+    .heji div{
+      border-right: 1px solid #000;
+      min-height: 20px;
+      line-height: 20px;
+      text-align: right;
+      padding-right: 5px;
+    }
+    .heji div:last-child{
+      border-right: 0;
+    }
+    .page{
+      text-align: center;
+      margin-top: 50px;
+    }
+    .page a{
+      color: #444;
+    }
+  </style>
+<section class="content-header">
+    <h1>{$Think.lang.c_title}</h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab1" data-toggle="tab">{$Think.lang.base_param}</a></li>
+                        <li class="pull-right"><a href="/" class="btn btn-sm" style="padding:10px 2px;"><i class="fa fa-list"></i> {$Think.lang.back}</a></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="box-body table-responsive">
+ <div class="title" style="width:95%; margin:0 auto; overflow: hidden;padding-bottom: 20px;font-family: 楷体;">
+    <div class="title-left" style="float: left;width: 57%;font-size: 44px;text-align: right;margin-top: 18px;">销售发票</div>
+    <div class="title-right" style="float: right;padding-right: 140px;">
+      <p style="font-size: 18px;margin-top:15px;margin-bottom:15px;">NO.{$numc}</p>
+      <p style="font-size: 12px;">开票日期：{$date}</p>
+    </div>
+    </div>
+    <div class="table" style="width: 88%;margin:0 auto;border: 1px solid #000;font-family: 楷体;">
+        <div class="buyer" style="overflow: hidden;height: 85px;border-bottom: 1px solid #000;">
+            <div class="buyer-tit" style="float: left;width:21%;height: 85px;text-align: center;line-height: 85px;border-right: 1px solid #000;">
+                <span style="font-size: 36px;">购买方</span>
+            </div>
+            <div class="buy-cont" style="padding-left: 8px;float: left;">
+                <p style="margin-bottom:3px;">
+                    <span>名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</span>
+                    <span>{$vipnum}({$nubmer.f_NAME})</span>
+                </p>
+                <p style="margin-top:3px;margin-bottom:3px;">
+                    <span>纳税人识别号：</span>
+                    <span></span>
+                </p>
+                <p style="margin-top:3px;margin-bottom:3px;">
+                    <span>地&nbsp;址、电&nbsp;话：</span>
+                    <span></span>
+                </p>
+                <p style="margin-top:3px;margin-bottom:3px;">
+                    <span>开户行及账号：</span>
+                    <span></span>
+                </p>
+            </div>
+        </div>
+        <div class="" style="position:relative;">
+        <div class="label-tit" style="overflow:hidden;font-size:14px;">
+          <p style='float:left;width:21%;'>货物或应税劳务、服务名称</p>
+               <p style='float:left;width:9%;'>购买类型</p>
+               <p style='float:left;width:6%;'>单位</p>
+               <p style='float:left;width:11%;'>数量</p>
+               <p style='float:left;width:13%;'>单价</p>
+               <p style='float:left;width:16%;'>金额</p>
+               <p style='float:left;width:7%;'>税率</p>
+               <p style='float:left;width: 17%;'>税额</p>
+        </div>
+          {volist name="list" id="vo"}
+            {volist name="$vo" id="item"}
+          <div class='div1' style='overflow:hidden;font-size:14px;'>
+               <div style='float:left;width:21%;text-align: left;padding-left: 5px;'>{$item.f_entryname}</div>
+               <div style='float:left;width:9%;min-height: 20px;'></div>
+               <div style='float:left;width:6%;min-height: 20px;'></div>
+               <div style='float:left;width:11%;'>{$item.shuliang}</div>
+               <div style='float:left;width:13%;'>{$item.danjia}</div>
+               <div style='float:left;width:16%;'>{$item.jine}</div>
+               <div style='float:left;width:7%;'>{$item.shuilv}%</div>
+               <div style='float:left;width: 17%;'>{$item.shuie}</div> 
+          </div>
+          {/volist}
+        {/volist}
+          <!-- 合计 -->
+          <div class="heji" style='overflow:hidden;font-size:14px;'>
+            <div style='float:left;width:21%;text-align: center;'>合计</div>
+            <div style='float:left;width:9%;min-height: 20px;'></div>
+            <div style='float:left;width:6%;min-height: 20px;'></div>
+            <div style='float:left;width:11%;min-height: 20px;'></div>
+            <div style='float:left;width:13%;min-height: 20px;'></div>
+            <div style='float:left;width:16%;'>{$hejijine}</div>
+            <div style='float:left;width:7%;min-height: 20px;'></div>
+            <div style='float:left;width: 17%;'>{$hejishuie}</div>
+        </div>
+   
+        </div>
+        <div class="amount" style="height: 40px;line-height:40px;overflow: hidden;border-top: 1px solid #000;">
+            <p style="float: left;width: 21%;text-align: center;margin: 0;border-right: 1px solid #000;">价税合计（大写）</p>
+            <p style="float: left;margin: 0;width: 55%;padding-left: 5px;">ⓧ{$hzongji}</p>
+            <p style="float: left;margin: 0;">（小写）¥{$zongji}</p>
+        </div>
+        <div class="sales" style="border-top: 1px solid #000;overflow: hidden;height: 85px;">
+            <div class="buyer-tit" style="float: left;width:21%;height: 85px;text-align: center;line-height: 85px;border-right: 1px solid #000;">
+                <span style="font-size: 36px;">销售方</span>
+            </div>
+            <div class="buy-cont" style="padding-left: 8px;float: left;width: 420px;">
+                <p style="margin-bottom:3px;">
+                    <span>名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</span>
+                    <span>{:confv('mingcheng')}</span>
+                </p>
+                <p style="margin-top:3px;margin-bottom:3px;">
+                    <span>纳税人识别号：</span>
+                    <span>{:confv('nashui')}</span>
+                </p>
+                <p style="margin-top:3px;margin-bottom:3px;">
+                    <span>地&nbsp;址、电&nbsp;话：</span>
+                    <span>{:confv('dizhi')}</span>
+                </p>
+                <p style="margin-top:3px;margin-bottom:3px;">
+                    <span>开户行及账号：</span>
+                    <span>{:confv('zhanghu')}</span>
+                </p>
+            </div>
+            <div class="remark" style="float: left;width: 40px;height:85px;text-align: center;
+                  border-left: 1px solid #000;border-right: 1px solid #000;">
+                <span style="margin-top: 13px;display: block;">备<br/><br/>注</span>
+            </div>
+            <div class="remark-txt" style="float: left;padding-left: 8px;padding-top: 20px;">
+                <span>账单流水号：{$liushui}</span>
+            </div>
+        </div>
+    </div>
+    <div class="page">
+    {if $right_id}{:auth_action(CONTROLLER_NAME.'/see', 'a', lang('上一页'), ['id' => $right_id.f_ID,'f_single'=>$right_id.f_single])} {else} <a href="" style="pointer-events: none;">没有了</a> {/if}
+    {if $left_id}{:auth_action(CONTROLLER_NAME.'/see', 'a', lang('下一页'), ['id' => $left_id.f_ID,'f_single'=>$left_id.f_single])} {else} <a href="" style="pointer-events: none;">没有了</a> {/if}
+ 
+    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{/block}

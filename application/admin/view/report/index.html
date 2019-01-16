@@ -1,0 +1,224 @@
+{extend name="public/base" /}
+
+{block name="title"}<title>{$Think.lang.list}</title>{/block}
+
+{block name="pjax_container"}
+<link rel="stylesheet" type="text/css" href="__STATIC__/layui/dist/css/layui.css">
+<script type="text/javascript" src="__STATIC__/layui/dist/layui.js"></script>
+<style type="text/css">
+.box-header h3{
+    width: 80px;
+    height: 26px;
+    background: #3c8dbc;
+    text-align: center;
+    line-height: 26px;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.layui-input, .layui-select, .layui-textarea{
+    height:30px;
+}
+.box-header>.box-tools form{
+    overflow:hidden;
+}
+.layui-form-label{
+    padding:0;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+.layui-inline{
+    float:left;
+    margin-right:6px;
+}
+.layui-inline select{
+    width: 100px;
+    height: 25px;
+    margin-top: 2px;
+}
+.input-group{
+    float:right;
+}
+.dayinBtn span{
+    display: block;
+    width: 55px;
+    height: 22px;
+    background: #3c8dbc;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+.operate{
+    overflow: hidden;
+}
+.dayinBtn{
+    float: left;
+}
+.dayinBtn span{
+    display: block;
+    width: 55px;
+    height: 22px;
+    background: #3c8dbc;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+.look{
+    float: left;
+    margin-left: 10px;
+}
+.look span{
+    display: block;
+    width: 55px;
+    height: 22px;
+    background: #3c8dbc;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+</style>
+<section class="content-header">
+    <!-- <h1>{$Think.lang.list}</h1> -->
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border" style="padding:26px;">
+                    <h3 class="box-title" id="dayin">批量打印</h3>
+                    <div class="box-tools" style="top:10px;">
+
+                        <form action="index" method="GET" pjax-search="">
+                            <!-- <div class="layui-inline"> -->
+                            <div class="layui-inline">
+                              <label class="layui-form-label">请选择范围</label>
+                              <div class="layui-input-inline date">
+                                <input type="text" class="layui-input" name="f_time" value="{:input('get.f_time')}" id="test16" placeholder="开始 到 结束" autocomplete="off">
+                              </div>
+                            </div>
+                            <div class="input-group input-group-sm" style="width:150px;">
+                                <div class="input-group-btn"><button type="submit" class="btn btn-default sreachs"><i class="fa fa-search"></i></button></div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+                 <div class="box-body table-responsive dayin">
+                    {if $datalist}
+                    <table class="table table-bordered table-hover table-sort">
+						<tr>
+						<td colspan="6" align="center"> 卡核销一览表 </td>
+						</tr>
+						<tr>
+						<td colspan="6" align="right"><span id="spanTime"> </span>  </td>
+						</tr>
+                        <tr>
+                            <td style="border-color: #ddd;">卡号类型</td>
+                            <td style="border-color: #ddd;">支付金额</td>
+                            <td style="border-color: #ddd;">本金金额(商业折扣后金额)</td>
+                            <td style="border-color: #ddd;">折扣金额</td>
+							<td style="border-color: #ddd;">税率</td>
+							<td style="border-color: #ddd;">税金</td>
+                        </tr>
+                        {volist name="datalist" id="vo"}
+                        <tr  >
+                            <td rowspan="3"  align="center"  style="border-color: #ddd;vertical-align: middle;">{$vo.name}</td>
+                            <td rowspan="3" align="center"  style="border-color: #ddd;vertical-align: middle;">{$vo.f_usrprice}</td>
+                            <td rowspan="3" align="center"  style="border-color: #ddd;vertical-align: middle;">{$vo.dcount}</td>
+                            <td  rowspan="3" align="center"  style="border-color: #ddd; vertical-align: middle;">{$vo.count}</td>
+							<td  style="border-color: #ddd;"> 6%</td>
+							<td  style="border-color: #ddd;"> {$vo.count6}</td>
+                        </tr>
+						<tr><td  style="border-color: #ddd;"> 16%</td>
+							<td  style="border-color: #ddd;"> {$vo.count16}</td>
+							</tr>
+							<tr><td  style="border-color: #ddd;"> 其它</td>
+							<td  style="border-color: #ddd;"> {$vo.countNull}</td>
+							</tr>
+                        {/volist}
+						<tr>
+						<td align="center"   style="border-color: #ddd;vertical-align: middle;"> 合计</td>
+						<td align="center"  style="border-color: #ddd;vertical-align: middle;">{$userprice}</td>
+						<td align="center"  style="border-color: #ddd;vertical-align: middle;">{$cot}</td>
+						<td align="center"  style="border-color: #ddd;vertical-align: middle;">{$uot}</td>
+						<td  style="border-color: #ddd;"></td>
+						<td  style="border-color: #ddd;"></td>
+						</tr>
+                    </table>
+                    
+                    {else /}
+                     <div style="text-align: center;margin-top: 110px;font-size: 16px;">请选择查看时间</div>
+                {/if}
+                </div>
+               
+               
+              <!--   <div class="box-footer clearfix">
+                </div> -->
+            </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+var time=$('#test16').val();
+$('#spanTime').html('时间:'+time);
+$('#dayin').on('click',function(){
+            $('.content-header').css('display','none')
+            $('footer').css('display','none');
+            $('.slimScrollDiv').css('display','none');
+            $('.main-header').css('display','none');
+            $('.main-sidebar').css('display','none');
+            $('.box-header').css('display','none');
+            $('.box-primary').css('display','none');
+            window.print();
+            $('.content-header').css('display','block')
+            $('footer').css('display','block');
+            $('.slimScrollDiv').css('display','block');
+            $('.main-header').css('display','block');
+            $('.main-sidebar').css('display','block');
+            $('.box-header').css('display','block');
+            $('.box-primary').css('display','block');
+})
+
+$('.sreachs').on('click',function(){
+
+ $('#spanTime').html('时间:'+time);
+});
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+      laydate.render({
+        elem: '#test16'
+        ,type: 'datetime'
+        ,range: '~'
+      });
+});
+$(function(){
+
+    $('.editable').editable({
+        emptytext: "empty",
+        params: function(params) {      //参数
+            var data = {};
+            data['id'] = params.pk;
+            data[params.name] = params.value;
+            return data;
+        },
+        success: function(response, newValue) {
+            var res = $.parseJSON( response );
+            if(res.status == 1){
+                toastr.success(res.info);
+            }else{
+                return res.info;
+            }
+        }
+    });
+})
+</script>
+{/block}
