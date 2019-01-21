@@ -1,5 +1,42 @@
 <?php
+
 use think\facade\Request;
+
+
+/**
+ * 导出Excel
+ * @param  object $spreadsheet 数据
+ * @param  string $format 格式:excel2003 = xls, excel2007 = xlsx
+ * @param  string $savename 保存的文件名
+ * @return filedownload         浏览器下载
+ * @author Victor.SU
+ * date 2019/1/21
+ * @throws
+ */
+function exportExcel($spreadsheet, $format = 'xls', $savename = 'export')
+{
+    if (!$spreadsheet) return false;
+    if ($format == 'xls') {
+        //输出Excel03版本
+        header('Content-Type:application/vnd.ms-excel');
+        $class = "\PhpOffice\PhpSpreadsheet\Writer\Xls";
+    } elseif ($format == 'xlsx') {
+        //输出07Excel版本
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $class = "\PhpOffice\PhpSpreadsheet\Writer\Xlsx";
+    }
+    //输出名称
+    header('Content-Disposition: attachment;filename="' . $savename . '.' . $format . '"');
+    //禁止缓存
+    header('Cache-Control: max-age=0');
+
+    $writer = new $class($spreadsheet);
+    $filePath = env('runtime_path') . "temp/" . time() . microtime(true) . ".tmp";
+    $writer->save($filePath);
+    readfile($filePath);
+    unlink($filePath);
+}
+
 
 /**
  * @Title: ajax_return
@@ -12,15 +49,22 @@ use think\facade\Request;
  * @date 2018年1月13日
  * @throws
  */
-function ajax_return($info='', $url='', $status='', $data = ''){
-    if(!empty($url)){   //操作成功
-        $result = array( 'info' => '操作成功', 'status' => 1, 'url' => $url, );
-    }else{   //操作失败
-        $result = array( 'info' => '操作失败', 'status' => 0, 'url' => '', );
+function ajax_return($info = '', $url = '', $status = '', $data = '')
+{
+    if (!empty($url)) {   //操作成功
+        $result = array('info' => '操作成功', 'status' => 1, 'url' => $url,);
+    } else {   //操作失败
+        $result = array('info' => '操作失败', 'status' => 0, 'url' => '',);
     }
-    if(!empty($info)){$result['info'] = $info;}
-    if(!empty($status)){$result['status'] = $status;}
-    if(!empty($data)){$result['data'] = $data;}
+    if (!empty($info)) {
+        $result['info'] = $info;
+    }
+    if (!empty($status)) {
+        $result['status'] = $status;
+    }
+    if (!empty($data)) {
+        $result['data'] = $data;
+    }
     echo json_encode($result);
     exit();
 }
@@ -34,18 +78,23 @@ function ajax_return($info='', $url='', $status='', $data = ''){
  * @date 2018年1月11日
  * @throws
  */
-function search_url($delparam){
-    $url_path = '/'.request()->path();
+function search_url($delparam)
+{
+    $url_path = '/' . request()->path();
     $get = input('get.');
-    if( isset($get[$delparam]) ){ unset($get[$delparam]); }
-    if( isset($get['_pjax'])   ){ unset($get['_pjax']);   }
-    if(!empty($get)){
+    if (isset($get[$delparam])) {
+        unset($get[$delparam]);
+    }
+    if (isset($get['_pjax'])) {
+        unset($get['_pjax']);
+    }
+    if (!empty($get)) {
         $paramStr = [];
-        foreach ($get as $k=>$v){
-            $paramStr[] = $k.'='.$v;
+        foreach ($get as $k => $v) {
+            $paramStr[] = $k . '=' . $v;
         }
         $paramStrs = implode('&', $paramStr);
-        $url_path = $url_path.'?'.$paramStrs;
+        $url_path = $url_path . '?' . $paramStrs;
     }
     return $url_path;
 }
@@ -58,9 +107,10 @@ function search_url($delparam){
  * @date 2018年1月13日
  * @throws
  */
-function page_param(){
+function page_param()
+{
     $param = request()->param();
-    if (isset($param['_pjax'])){
+    if (isset($param['_pjax'])) {
         unset($param['_pjax']);
     }
     $res['query'] = $param;
@@ -76,36 +126,39 @@ function page_param(){
  * @date 2018年1月13日
  * @throws
  */
-function table_sort($param){
-    $url_path = '/'.request()->path();
+function table_sort($param)
+{
+    $url_path = '/' . request()->path();
     $faStr = 'fa-sort';
     $get = input('get.');
-    if( isset($get['_pjax']) ){ unset($get['_pjax']); }
+    if (isset($get['_pjax'])) {
+        unset($get['_pjax']);
+    }
 
-    if( isset($get['_sort']) ){   //判断是否存在排序字段
+    if (isset($get['_sort'])) {   //判断是否存在排序字段
         $sortArr = explode(',', $get['_sort']);
-        if ( $sortArr[0] == $param ){   //当前排序
-            if ($sortArr[1] == 'asc'){
+        if ($sortArr[0] == $param) {   //当前排序
+            if ($sortArr[1] == 'asc') {
                 $faStr = 'fa-sort-asc';
                 $sort = 'desc';
-            }elseif ($sortArr[1] == 'desc'){
+            } elseif ($sortArr[1] == 'desc') {
                 $faStr = 'fa-sort-desc';
                 $sort = 'asc';
             }
-            $get['_sort'] = $param.','.$sort;
-        }else{   //非当前排序
-            $get['_sort'] = $param.',asc';
+            $get['_sort'] = $param . ',' . $sort;
+        } else {   //非当前排序
+            $get['_sort'] = $param . ',asc';
         }
-    }else{
-        $get['_sort'] = $param.',asc';
+    } else {
+        $get['_sort'] = $param . ',asc';
     }
     $paramStr = [];
-    foreach ($get as $k=>$v){
-        $paramStr[] = $k.'='.$v;
+    foreach ($get as $k => $v) {
+        $paramStr[] = $k . '=' . $v;
     }
     $paramStrs = implode('&', $paramStr);
-    $url_path = $url_path.'?'.$paramStrs;
-    return "<a class=\"fa ".$faStr."\" href=\"".$url_path."\"></a>";
+    $url_path = $url_path . '?' . $paramStrs;
+    return "<a class=\"fa " . $faStr . "\" href=\"" . $url_path . "\"></a>";
 }
 
 /**
@@ -117,9 +170,10 @@ function table_sort($param){
  * @date 2018年1月23日
  * @throws
  */
-function del_arr_empty($arr){
-    foreach ($arr as $key => $value){
-        if ($value == ''){
+function del_arr_empty($arr)
+{
+    foreach ($arr as $key => $value) {
+        if ($value == '') {
             unset($arr[$key]);
         }
     }
@@ -130,29 +184,30 @@ function del_arr_empty($arr){
  * @Title: deldir
  * @Description: todo(删除文件和文件夹)
  * @param string $dir
- * @param string $folder【y:同时删除文件夹,n:只删除文件】
+ * @param string $folder【y :同时删除文件夹,n:只删除文件】
  * @return boolean
  * @author 苏晓信
  * @date 2018年1月26日
  * @throws
  */
-function deldir($dir, $folder='n'){
+function deldir($dir, $folder = 'n')
+{
     //删除当前文件夹下得文件（并不删除文件夹）：
-    $dh=opendir($dir);
-    while ($file=readdir($dh)) {
-        if($file!="." && $file!="..") {
-            $fullpath=$dir."/".$file;
-            if(!is_dir($fullpath)) {
+    $dh = opendir($dir);
+    while ($file = readdir($dh)) {
+        if ($file != "." && $file != "..") {
+            $fullpath = $dir . "/" . $file;
+            if (!is_dir($fullpath)) {
                 unlink($fullpath);
             } else {
-                deldir($fullpath,$folder);
+                deldir($fullpath, $folder);
             }
         }
     }
     closedir($dh);
     //删除当前文件夹
-    if($folder=='y'){
-        if(rmdir($dir)){
+    if ($folder == 'y') {
+        if (rmdir($dir)) {
             return true;
         } else {
             return false;
@@ -169,9 +224,10 @@ function deldir($dir, $folder='n'){
  * @date 2018年2月2日
  * @throws
  */
-function trimall($str){
-    $qian=array(" ","　","\t","\n","\r");
-    $hou=array("","","","","");
+function trimall($str)
+{
+    $qian = array(" ", "　", "\t", "\n", "\r");
+    $hou = array("", "", "", "", "");
     return str_replace($qian, $hou, $str);
 }
 
@@ -188,26 +244,27 @@ function trimall($str){
  * @date 2018年2月2日
  * @throws
  */
-function csubstr($str, $length, $charset="", $start=0, $suffix=true) {
+function csubstr($str, $length, $charset = "", $start = 0, $suffix = true)
+{
     if (empty($charset))
         $charset = "utf-8";
-        if (function_exists("mb_substr")) {
-            if (mb_strlen($str, $charset) <= $length)
-                return $str;
-                $slice = mb_substr($str, $start, $length, $charset);
-        }else {
-            $re['utf-8'] = "/[\x01-\x7f]¦[\xc2-\xdf][\x80-\xbf]¦[\xe0-\xef][\x80-\xbf]{2}¦[\xf0-\xff][\x80-\xbf]{3}/";
-            $re['gb2312'] = "/[\x01-\x7f]¦[\xb0-\xf7][\xa0-\xfe]/";
-            $re['gbk'] = "/[\x01-\x7f]¦[\x81-\xfe][\x40-\xfe]/";
-            $re['big5'] = "/[\x01-\x7f]¦[\x81-\xfe]([\x40-\x7e]¦\xa1-\xfe])/";
-            preg_match_all($re[$charset], $str, $match);
-            if (count($match[0]) <= $length)
-                return $str;
-                $slice = join("", array_slice($match[0], $start, $length));
-        }
-        if ($suffix)
-            return $slice . "...";
-        return $slice;
+    if (function_exists("mb_substr")) {
+        if (mb_strlen($str, $charset) <= $length)
+            return $str;
+        $slice = mb_substr($str, $start, $length, $charset);
+    } else {
+        $re['utf-8'] = "/[\x01-\x7f]¦[\xc2-\xdf][\x80-\xbf]¦[\xe0-\xef][\x80-\xbf]{2}¦[\xf0-\xff][\x80-\xbf]{3}/";
+        $re['gb2312'] = "/[\x01-\x7f]¦[\xb0-\xf7][\xa0-\xfe]/";
+        $re['gbk'] = "/[\x01-\x7f]¦[\x81-\xfe][\x40-\xfe]/";
+        $re['big5'] = "/[\x01-\x7f]¦[\x81-\xfe]([\x40-\x7e]¦\xa1-\xfe])/";
+        preg_match_all($re[$charset], $str, $match);
+        if (count($match[0]) <= $length)
+            return $str;
+        $slice = join("", array_slice($match[0], $start, $length));
+    }
+    if ($suffix)
+        return $slice . "...";
+    return $slice;
 }
 
 /**
@@ -220,9 +277,10 @@ function csubstr($str, $length, $charset="", $start=0, $suffix=true) {
  * @date 2018年2月4日
  * @throws
  */
-function unset_array($str,$arr){
-    foreach ($arr as $key => $value){
-        if ($value === $str){
+function unset_array($str, $arr)
+{
+    foreach ($arr as $key => $value) {
+        if ($value === $str) {
             unset($arr[$key]);
         }
     }
@@ -239,16 +297,17 @@ function unset_array($str,$arr){
  * @date 2018年2月2日
  * @throws
  */
-function auto_description($d, $c){
-    if( empty($d) ){
-        if( !empty($c) ){
+function auto_description($d, $c)
+{
+    if (empty($d)) {
+        if (!empty($c)) {
             $c = trimall(strip_tags(htmlspecialchars_decode($c)));   //转换标签-去掉HTML标签
             $c = csubstr($c, 250, '', 0, false);
             $result = $c;
-        }else{
+        } else {
             $result = '';
         }
-    }else{
+    } else {
         $result = $d;
     }
     return $result;
@@ -265,7 +324,8 @@ function auto_description($d, $c){
  * @date 2018年2月4日
  * @throws
  */
-function input($key = '', $default = null, $filter = null){
+function input($key = '', $default = null, $filter = null)
+{
     if (0 === strpos($key, '?')) {
         $key = substr($key, 1);
         $has = true;
@@ -285,9 +345,9 @@ function input($key = '', $default = null, $filter = null){
     if (isset($has)) {
         return Request::has($key, $method, $default);
     } else {
-        if (!empty($filter)){
+        if (!empty($filter)) {
             return Request::$method($key, $default, $filter);
-        }else{
+        } else {
             return Request::$method($key, $default);
         }
     }
@@ -302,24 +362,25 @@ function input($key = '', $default = null, $filter = null){
  * @date 2018年2月6日
  * @throws
  */
-function time_line($time){
+function time_line($time)
+{
     $rtime = $time;
-    $time = time () - strtotime($time);
-    if($time < 60){
-        $str = $time.'秒之前';
-    }elseif($time < 60*60){
-        $min = floor( $time/60 );
-        $str = $min.'分钟前';
-    }elseif($time < 60*60*24){
-        $h = floor($time/(60*60));
-        $str = $h.'小时前 ';
-    }elseif($time < 60*60*24*3) {
-        $d = floor($time/(60*60*24));
+    $time = time() - strtotime($time);
+    if ($time < 60) {
+        $str = $time . '秒之前';
+    } elseif ($time < 60 * 60) {
+        $min = floor($time / 60);
+        $str = $min . '分钟前';
+    } elseif ($time < 60 * 60 * 24) {
+        $h = floor($time / (60 * 60));
+        $str = $h . '小时前 ';
+    } elseif ($time < 60 * 60 * 24 * 3) {
+        $d = floor($time / (60 * 60 * 24));
         if ($d == 1)
-            $str = $d.'天以前';
-            else
-                $str = $d.'天以前';
-    }else{
+            $str = $d . '天以前';
+        else
+            $str = $d . '天以前';
+    } else {
         $str = date('Y-m-d', strtotime($rtime));
     }
     return $str;
@@ -334,13 +395,14 @@ function time_line($time){
  * @date 2018年2月8日
  * @throws
  */
-function flagPos($flag){
+function flagPos($flag)
+{
     $flag_arr = explode(',', $flag);
-    if (in_array('h', $flag_arr)){
+    if (in_array('h', $flag_arr)) {
         return '<div class="flag bg-red">头条</div>';
-    }elseif (in_array('a', $flag_arr)){
+    } elseif (in_array('a', $flag_arr)) {
         return '<div class="flag bg-orange">特荐</div>';
-    }elseif (in_array('c', $flag_arr)){
+    } elseif (in_array('c', $flag_arr)) {
         return '<div class="flag bg-green">推荐</div>';
     }
 }
@@ -358,11 +420,12 @@ function flagPos($flag){
  * @date 2018年1月11日
  * @throws
  */
-function authcheck($rule, $uid, $relation='or', $t='', $f='noauth'){
+function authcheck($rule, $uid, $relation = 'or', $t = '', $f = 'noauth')
+{
     $auth = new \expand\Auth();
-    if( $auth->check($rule, $uid, $type=1, $mode='url',$relation) ){
+    if ($auth->check($rule, $uid, $type = 1, $mode = 'url', $relation)) {
         $result = $t;
-    }else{
+    } else {
         $result = $f;
     }
     return $result;
@@ -383,15 +446,16 @@ function authcheck($rule, $uid, $relation='or', $t='', $f='noauth'){
  * @date 2018年1月13日
  * @throws
  */
-function auth_action($rule, $cationType='a', $info='infos', $param='', $color='primary', $size='xs', $icon='edit'){
+function auth_action($rule, $cationType = 'a', $info = 'infos', $param = '', $color = 'primary', $size = 'xs', $icon = 'edit')
+{
     $cationTypes = [
-        'a' => "<a class=\"btn btn-".$color." btn-".$size."\" href=\"".url($rule, $param)."\"><i class=\"fa fa-".$icon."\"></i> ".$info."</a>",
-        'box' => "<a class=\"btn btn-".$color." btn-".$size." delete\" href=\"javascript:void(0);\" data-url=\"".url($rule)."\" data-id=\"".$param."\" data-title=\"".$info."\" ><i class=\"fa fa-".$icon."\"></i> ".$info."</a>",
-        'btn' => "<button type=\"submit\" class=\"btn btn-".$color." btn-".$size." pull-right submits\" data-loading-text=\"&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; ".$info."\">".$info."</button>",
+        'a' => "<a class=\"btn btn-" . $color . " btn-" . $size . "\" href=\"" . url($rule, $param) . "\"><i class=\"fa fa-" . $icon . "\"></i> " . $info . "</a>",
+        'box' => "<a class=\"btn btn-" . $color . " btn-" . $size . " delete\" href=\"javascript:void(0);\" data-url=\"" . url($rule) . "\" data-id=\"" . $param . "\" data-title=\"" . $info . "\" ><i class=\"fa fa-" . $icon . "\"></i> " . $info . "</a>",
+        'btn' => "<button type=\"submit\" class=\"btn btn-" . $color . " btn-" . $size . " pull-right submits\" data-loading-text=\"&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; " . $info . "\">" . $info . "</button>",
     ];
-    if( authcheck($rule, UID) != 'noauth' ){
+    if (authcheck($rule, UID) != 'noauth') {
         $result = $cationTypes[$cationType];
-    }else{
+    } else {
         $result = '';
     }
     return $result;
