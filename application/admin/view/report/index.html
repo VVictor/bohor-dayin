@@ -147,6 +147,8 @@
                         <td style="border-color: #ddd;">折扣金额</td>
                         <td style="border-color: #ddd;">税率</td>
                         <td style="border-color: #ddd;">税金</td>
+                        <td style="border-color: #ddd;">分摊金额</td>
+
                     </tr>
                     {volist name="datalist" id="vo"}
                     <tr>
@@ -161,14 +163,18 @@
                         </td>
                         <td style="border-color: #ddd;"> 6%</td>
                         <td style="border-color: #ddd;"> {$vo.count6}</td>
+                        <td style="border-color: #ddd;"> {$vo.count6_fuserprice}</td>
+
                     </tr>
                     <tr>
                         <td style="border-color: #ddd;"> 16%</td>
                         <td style="border-color: #ddd;"> {$vo.count16}</td>
+                        <td style="border-color: #ddd;"> {$vo.count16_fuserprice}</td>
                     </tr>
                     <tr>
                         <td style="border-color: #ddd;"> 其它</td>
                         <td style="border-color: #ddd;"> {$vo.countNull}</td>
+                        <td style="border-color: #ddd;"> {$vo.countNull_fuserprice}</td>
                     </tr>
                     {/volist}
                     <tr>

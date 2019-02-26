@@ -76,6 +76,11 @@ class Report extends SysAction
             $datalist[$key]['count16'] = sprintf("%.2f", $list16find['f_userprice'] * $pe['principal']);
             $datalist[$key]['countNull'] = sprintf("%.2f", $listfind['f_userprice'] * $pe['principal']);
 
+            $datalist[$key]['count6_fuserprice'] = sprintf("%.2f", $list6find['f_userprice']);
+            $datalist[$key]['count16_fuserprice'] = sprintf("%.2f", $list16find['f_userprice']);
+            $datalist[$key]['countNull_fuserprice'] = sprintf("%.2f", $listfind['f_userprice']);
+
+
             $userprice = sprintf("%.2f", $userprice + $value['f_userprice']);
             $cot = sprintf("%.2f", $cot + $value['f_userprice'] * $pe['principal']);
             $uot = sprintf("%.2f", $uot + $value['f_userprice'] * $pe['rate']);
@@ -97,12 +102,12 @@ class Report extends SysAction
         // Add title name
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', '卡核销一览表')
-            ->mergeCellsByColumnAndRow(1, 1, 6, 1);
+            ->mergeCellsByColumnAndRow(1, 1, 7, 1);
 
         // Add title name
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A2', $time)
-            ->mergeCellsByColumnAndRow(1, 2, 6, 2);
+            ->mergeCellsByColumnAndRow(1, 2, 7, 2);
 
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A3', '卡号类型')
@@ -110,7 +115,8 @@ class Report extends SysAction
             ->setCellValue('C3', '本金金额(商业折扣后金额)')
             ->setCellValue('D3', '折扣金额')
             ->setCellValue('E3', '税率')
-            ->setCellValue('F3', '税金');
+            ->setCellValue('F3', '税金')
+            ->setCellValue('G3', '分摊金额');
 
         // Rename worksheet
         $spreadsheet->getActiveSheet()->setTitle('报表统计');
@@ -173,7 +179,10 @@ class Report extends SysAction
                 ->setCellValueByColumnAndRow(5, $i + 2, '其他')
                 ->setCellValueByColumnAndRow(6,  $i, sprintf("%.2f", $list6find['f_userprice'] * $pe['principal']))
                 ->setCellValueByColumnAndRow(6, $i + 1, sprintf("%.2f", $list16find['f_userprice'] * $pe['principal']))
-                ->setCellValueByColumnAndRow(6, $i + 2, sprintf("%.2f", $listfind['f_userprice'] * $pe['principal']));
+                ->setCellValueByColumnAndRow(6, $i + 2, sprintf("%.2f", $listfind['f_userprice'] * $pe['principal']))
+                ->setCellValueByColumnAndRow(7,  $i, sprintf("%.2f", $list6find['f_userprice']))
+                ->setCellValueByColumnAndRow(7, $i + 1, sprintf("%.2f", $list16find['f_userprice'] ))
+                ->setCellValueByColumnAndRow(7, $i + 2, sprintf("%.2f", $listfind['f_userprice'] ));
             $i = $i + 3;
         }
 
@@ -205,6 +214,9 @@ class Report extends SysAction
             ->setWidth(20);
         $spreadsheet->getActiveSheet()
             ->getColumnDimension('F')
+            ->setWidth(20);
+        $spreadsheet->getActiveSheet()
+            ->getColumnDimension('G')
             ->setWidth(20);
 
         // Set alignment
